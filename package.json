@@ -1,0 +1,26 @@
+{
+    "name"         : "node-red-contrib-audio-analyser",
+    "version"      : "1.0.0",
+    "description"  : "A Node Red node for analyzing PCM audio streams",
+    "dependencies": {
+        "audio-analyser": "1.0.2"
+    },
+    "author": {
+        "name": "Bart Butenaers"
+    },
+    "license": "Apache-2.0",
+    "keywords": [ "node-red", "pcm", "audio", "sound", "spectrum", "analyser" ],
+    "bugs": {
+        "url": "https://github.com/bartbutenaers/node-red-contrib-audio-analyser/issues"
+    },
+    "homepage": "https://github.com/bartbutenaers/node-red-contrib-audio-analyser",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/bartbutenaers/node-red-contrib-audio-analyser.git"
+    },
+    "node-red"     : {
+        "nodes": {
+            "audio-analyser": "audio_analyser.js"
+        }
+    }
+}
