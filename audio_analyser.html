@@ -1,0 +1,69 @@
+<!--
+  Copyright 2018, Bart Butenaers
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<script type="text/x-red" data-template-name="audio-analyser">
+    <div class="form-row">
+        <label for="node-input-minDecibels"><i class="fa fa-level-up"></i> Min db</label>
+        <input type="number" id="node-input-minDecibels" placeholder="100">
+    </div>
+    <div class="form-row">
+        <label for="node-input-maxDecibels"><i class="fa fa-level-down"></i> Max db</label>
+        <input type="number" id="node-input-maxDecibels" placeholder="30">
+    </div>
+    <div class="form-row">
+        <label for="node-input-fftSize"><i class="fa fa-barcode"></i> FFT size</label>
+        <input type="number" id="node-input-fftSize" placeholder="1024">
+    </div>
+    <div class="form-row">
+        <label for="node-input-smoothingTimeConstant"><i class="fa fa-clock"></i> Smooth time</label>
+        <input type="number" id="node-input-smoothingTimeConstant" placeholder="0.2">
+    </div>    
+    <div class="form-row">
+        <label for="node-input-channel"><i class="fa fa-hashtag"></i> Channel</label>
+        <input type="number" id="node-input-channel" placeholder="0">
+    </div>  
+    <div class="form-row">
+        <label for="node-input-bufferSize"><i class="fa fa-arrows-h"></i> Buffer size</label>
+        <input type="number" id="node-input-bufferSize" placeholder="44100">
+    </div>      
+    <br>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('audio-analyser', {
+        category: 'input',
+        color:    'rgb(231, 231, 174)',
+        defaults: {
+            name: {value: ""},
+            minDecibels: {value: -100},
+            maxDecibels: {value: -30},
+            fftSize: {value: 1024},
+            smoothingTimeConstant: {value: 1024},
+            channel: {value: 1024},
+            bufferSize: {value: 1024}
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "arrows.png",
+        label: function() {
+            return this.name || "WAV headers";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-help-name="audio-analyser">
+    <p>A Node Red node for analyzing PCM audio streams.</p>
+</script>
