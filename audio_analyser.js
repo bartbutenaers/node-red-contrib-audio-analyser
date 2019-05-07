@@ -18,9 +18,10 @@ module.exports = function(RED) {
 
 	function AudioAnalyserNode(config) {
 		RED.nodes.createNode(this, config);
+        this.analysis              = config.analysis || 'time';
         this.minDecibels           = config.minDecibels || -100;
         this.maxDecibels           = config.maxDecibels || -30;
-        this.fftSize               = config.fftSize || 1024;
+        this.fftSize               = config.fftSize || 2048;
         this.smoothingTimeConstant = config.smoothingTimeConstant || 0.2;
         this.channel               = config.channel || 0;
         this.bufferSize            = config.bufferSize || 44100;
@@ -28,14 +29,19 @@ module.exports = function(RED) {
         var node = this;
         
         node.audioAnalyser = new AudioAnalyser({
-            // Magnitude diapasone, in dB
+            // The minimum value for the range of results 
+            // 0 dB is the loudest possible sound, -10 dB is a 10th of that, ...
             minDecibels: config.minDecibels,
             maxDecibels: config.maxDecibels,
-            // Number of time samples to transform to frequency
+            // Number of time samples to transform to frequency.
+            // An unsigned integer, representing the window size of the FFT, given in number of samples. 
+            // A higher value will result in more details in the frequency domain but fewer details in the time domain.
             fftSize: config.fftSize,
-            // Number of frequencies, twice less than fftSize
+            // Number of frequency measurements, twice less than fftSize
             frequencyBinCount: config.fftSize/2,
-            // Smoothing, or the priority of the old data over the new data
+            // Smoothing, or the priority of the old data over the new data, to make the meter less jittery. 
+            // With this variable we use input from a longer time period to calculate the amplitudes, this results in a more smooth meter.
+            // A double within the range 0 to 1 (0 meaning no time averaging)
             smoothingTimeConstant: config.smoothingTimeConstant,
             // Number of channel to analyse
             channel: config.channel,
@@ -48,14 +54,22 @@ module.exports = function(RED) {
         })
         
         node.audioAnalyser.on('data', function (chunk) {
-            var floatFreq = this.getFloatFrequencyData(new Float32Array(this.fftSize));
-            var floatTime = this.getFloatTimeDomainData(new Float32Array(this.fftSize));
-            var byteFreq = this.getByteFrequencyData(new Uint8Array(this.fftSize));
-            var byteTime = this.getByteTimeDomainData(new Uint8Array(this.fftSize));
-            var freq = this.getFrequencyData();
-            var time = this.getTimeData();
+            var analyserData;
+            
+            switch (node.analysis) {
+                case 'time':
+                    // The byte values do range between 0-255
+                    analyserData = this.getTimeData();
+                    break;
+                case 'freq':
+                    // Get a normalized array of values between 0 and 255
+                    // The frequency bands are split equally, so each element N of your array corresponds to: N * samplerate / fftSize
+                    // E.g. when samplerate is 44100 and fftSize is 512, then the first bin is 0 and the second will be 86.13 Hz and so on ...
+                    analyserData = this.getFrequencyData();
+                    break;           
+            }                    
 
-          // TODO node.send( ... );
+            node.send( {payload: analyserData});
         });
 
         node.on("input", function(msg) {
@@ -70,7 +84,7 @@ module.exports = function(RED) {
             }
         
             // This will trigger the on-data call of the audio analyser
-            node.audioAnalyser._transform(audioChunk);
+            node.audioAnalyser._transform(audioChunk, null, function() {});
         });
     }
   
