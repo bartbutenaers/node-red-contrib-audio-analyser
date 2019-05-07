@@ -12,28 +12,47 @@
 -->
 <script type="text/x-red" data-template-name="audio-analyser">
     <div class="form-row">
+        <label for="node-input-analysis"><i class="fa fa-bar-chart"></i> Analysis</label>
+        <select id="node-input-analysis">
+            <option value="time">Time data</option>
+            <option value="freq">Frequency data</option>
+        </select>
+    </div>
+    <div class="form-row node-input-frequency-row">
         <label for="node-input-minDecibels"><i class="fa fa-level-up"></i> Min db</label>
-        <input type="number" id="node-input-minDecibels" placeholder="100">
+        <input type="number" id="node-input-minDecibels" step="1" pattern="\d*">
     </div>
-    <div class="form-row">
+    <div class="form-row node-input-frequency-row">
         <label for="node-input-maxDecibels"><i class="fa fa-level-down"></i> Max db</label>
-        <input type="number" id="node-input-maxDecibels" placeholder="30">
+        <input type="number" id="node-input-maxDecibels" step="1" pattern="\d*">
     </div>
-    <div class="form-row">
+    <div class="form-row node-input-frequency-row">
         <label for="node-input-fftSize"><i class="fa fa-barcode"></i> FFT size</label>
-        <input type="number" id="node-input-fftSize" placeholder="1024">
+        <select id="node-input-fftSize">
+            <option value="32">32</option>
+            <option value="64">64</option>
+            <option value="128">128</option>
+            <option value="256">256</option>
+            <option value="512">512</option>
+            <option value="1024">1024</option>
+            <option value="2048">2048</option>
+            <option value="4096">4096</option>
+            <option value="8192">8192</option>
+            <option value="16384">16384</option>
+            <option value="32768">32768</option>
+        </select>
     </div>
     <div class="form-row">
         <label for="node-input-smoothingTimeConstant"><i class="fa fa-clock"></i> Smooth time</label>
-        <input type="number" id="node-input-smoothingTimeConstant" placeholder="0.2">
+        <input type="number" id="node-input-smoothingTimeConstant" min="0" max="1">
     </div>    
     <div class="form-row">
         <label for="node-input-channel"><i class="fa fa-hashtag"></i> Channel</label>
-        <input type="number" id="node-input-channel" placeholder="0">
+        <input type="number" id="node-input-channel" step="1" pattern="\d*">
     </div>  
     <div class="form-row">
         <label for="node-input-bufferSize"><i class="fa fa-arrows-h"></i> Buffer size</label>
-        <input type="number" id="node-input-bufferSize" placeholder="44100">
+        <input type="number" id="node-input-bufferSize" step="1" pattern="\d*">
     </div>      
     <br>
     <div class="form-row">
@@ -48,10 +67,11 @@
         color:    'rgb(231, 231, 174)',
         defaults: {
             name: {value: ""},
+            analysis: {value: "time"},
             minDecibels: {value: -100},
             maxDecibels: {value: -30},
-            fftSize: {value: 1024},
-            smoothingTimeConstant: {value: 1024},
+            fftSize: {value: 2048},
+            smoothingTimeConstant: {value: 0.8},
             channel: {value: 1024},
             bufferSize: {value: 1024}
         },
@@ -60,6 +80,16 @@
         icon: "arrows.png",
         label: function() {
             return this.name || "Audio analyser";
+        },
+        oneditprepare: function() {
+            // Show the frequency related fields only when frequency domain analysis has been selected
+            $("#node-input-analysis").change(function() {
+                if ($(this).val() === "freq") {
+                    $(".node-input-frequency-row").show();
+                } else {
+                    $(".node-input-frequency-row").hide();
+                }
+            });
         }
     });
 </script>
