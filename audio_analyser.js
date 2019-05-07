@@ -31,6 +31,8 @@ module.exports = function(RED) {
         node.audioAnalyser = new AudioAnalyser({
             // The minimum value for the range of results 
             // 0 dB is the loudest possible sound, -10 dB is a 10th of that, ...
+            // Any frequencies with an amplitude of maxDecibels or higher will be returned as +1.0 or 255, respectively.
+            // Any frequencies with an amplitude of minDecibels or lower will be returned as 0.0 or 0, respectively.
             minDecibels: config.minDecibels,
             maxDecibels: config.maxDecibels,
             // Number of time samples to transform to frequency.
@@ -46,11 +48,7 @@ module.exports = function(RED) {
             // Number of channel to analyse
             channel: config.channel,
             // Size of time data to buffer
-            bufferSize: config.bufferSize,
-            // Windowing function for fft, https://github.com/scijs/window-functions
-            applyWindow: function (sampleNumber, totalSamples) {
-            }
-            //...pcm-stream params, if required
+            bufferSize: config.bufferSize
         })
         
         node.audioAnalyser.on('data', function (chunk) {
@@ -58,7 +56,7 @@ module.exports = function(RED) {
             
             switch (node.analysis) {
                 case 'time':
-                    // The byte values do range between 0-255
+                    // The byte values do range between 0-255 
                     analyserData = this.getTimeData();
                     break;
                 case 'freq':
@@ -84,7 +82,7 @@ module.exports = function(RED) {
             }
         
             // This will trigger the on-data call of the audio analyser
-            node.audioAnalyser._transform(audioChunk, null, function() {});
+            node.audioAnalyser._write(audioChunk, null, function() {});
         });
     }
   
